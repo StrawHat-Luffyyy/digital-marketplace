@@ -2,9 +2,20 @@
 
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
+import { createServer } from "@/lib/supabase/server";
 
-export async function createCheckoutSession(priceId: string) {
+export async function createCheckoutSession(
+  priceId: string,
+  productId: number
+) {
+  const supabase = await createServer();
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return redirect("/login");
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -18,6 +29,11 @@ export async function createCheckoutSession(priceId: string) {
       mode: "payment",
       success_url: `http://localhost:3000/payment/success`,
       cancel_url: `http://localhost:3000/payment/cancel`,
+
+      metadata: {
+        user_id: user.id,
+        product_id: productId,
+      },
     });
 
     if (session.url) {

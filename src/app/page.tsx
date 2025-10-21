@@ -28,7 +28,6 @@ export default async function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product: Product) => (
           <Card key={product.id} className="overflow-hidden flex flex-col">
-            {/* Image Section */}
             <div className="aspect-video relative w-full">
               <Image
                 src={product.image_url}
@@ -37,23 +36,21 @@ export default async function Home() {
                 className="object-cover"
               />
             </div>
-
-            {/* Content Section */}
             <div className="p-4 flex-grow">
               <h3 className="text-lg font-semibold">{product.name}</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 {product.description}
               </p>
             </div>
-            {/* Footer with Buy Button */}
             <div className="p-4 pt-0 flex justify-between items-center">
               <p className="text-lg font-semibold">${product.price}</p>
-              {/* This form calls the Stripe checkout action */}
+
               {product.stripe_price_id && (
                 <form
                   action={createCheckoutSession.bind(
                     null,
-                    product.stripe_price_id
+                    product.stripe_price_id,
+                    product.id
                   )}
                 >
                   <Button type="submit">Buy Now</Button>
